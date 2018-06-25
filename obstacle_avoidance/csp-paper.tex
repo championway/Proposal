@@ -1,0 +1,115 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%2345678901234567890123456789012345678901234567890123456789012345678901234567890
+%        1         2         3         4         5         6         7         8
+
+\documentclass[letterpaper, 10 pt, conference]{ieeeconf}  % Comment this line out if you need a4paper
+
+%\documentclass[a4paper, 10pt, conference]{ieeeconf}      % Use this line for a4 paper
+
+\IEEEoverridecommandlockouts                              % This command is only needed if 
+                                                          % you want to use the \thanks command
+
+\overrideIEEEmargins                                      % Needed to meet printer requirements.
+
+% See the \addtolength command later in the file to balance the column lengths
+% on the last page of the document
+
+% The following packages can be found on http:\\www.ctan.org
+%\usepackage{graphics} % for pdf, bitmapped graphics files
+%\usepackage{epsfig} % for postscript graphics files
+%\usepackage{mathptmx} % assumes new font selection scheme installed
+%\usepackage{times} % assumes new font selection scheme installed
+%\usepackage{amsmath} % assumes amsmath package installed
+%\usepackage{amssymb}  % assumes amsmath package installed
+\usepackage{graphicx}
+\usepackage[export]{adjustbox}
+\usepackage{hyperref}
+\graphicspath{ {images/} }
+
+
+\title{\LARGE \bf
+Self-driving robot with obstacle avoidance
+}
+
+
+\author{Pin-Wei Chen$^{1}$% <-this % stops a space
+\thanks{*This work was supported by the Robotics Master Program in National Chiao Tung University, Taiwan}% <-this % stops a space
+\thanks{$^{1}$Pin-Wei Chen, National Chiao Tung University, Taiwan.		{\tt\small ccpwearth@gmail.com}}%
+}
+
+
+\begin{document}
+
+\maketitle
+\thispagestyle{empty}
+\pagestyle{empty}
+
+
+\section{INTRODUCTION \& MOTIVATION}
+
+The purpose of this project is to build a robot which can do self-driving task in an environment with obstacles, which is also the task in RobotX. I will try to give the robot a pair of latitude and longitude, and I will let the robot navigate to the goal point and also avoid the obstacles. And then I will test this system in marine Gazebo enviroment, and replace the wheel robot to WAM-V gazebo model.
+
+\section{SYSTEM ARCHITECTURE \& EQUIPMENTS}
+
+I use the wood and some Aluminum stick to build the robot. My robot has IMU, GPS, Wheel odometry and LIDAR (Velodyne VLP-16) on it as its' sensors.
+
+
+\begin{figure}[h] % t means put this image at the top 
+\includegraphics[width=0.6\columnwidth]{robot}
+\centering
+\caption{Self-driving robot}
+\label{figure:robot}
+\end{figure}
+
+\begin{figure}[t] % h means put this image here
+\includegraphics[width=0.8\columnwidth]{JGB37-520}
+\centering
+\caption{JGB37-520 encoder motor}
+ \label{figure:JGB37-520}
+\end{figure}
+
+\section{SPECIFIC AIMS}
+
+\begin{itemize}
+\item Localize robot with GPS, IMU, wheel odometry and LIDAR.
+\end{itemize}
+
+\begin{itemize}
+\item Use point cloud to cluster and find the obstacle
+\end{itemize}
+
+\begin{itemize}
+\item Plan a path to let the vehicle navigate without collision
+\end{itemize}
+
+\begin{itemize}
+\item Build a simple global map to describe the obstacle position
+\end{itemize}
+
+\section{APPROACH}
+
+\subsection{Localization}
+
+I use IMU, GPS and wheel odometry to do EKF(Extended Kalman Filter). Also, I add LIDAR measurement to do SLAM (GMapping). And these two way can both get a robot odoemetry measurement. So I take these two odometry to do fusion again, and then I can get a very good robot localization and mapping.
+
+\subsection{Point cloud Processing}
+
+First, I make the noise filter, which is to choose a point P and check how many points next to it within radius r. If the number is lower than a threshold, then we can tell it is an outlier noise.
+And then I do the plane filter to remove the floor, because the floor will affect our clustering result. The way I do is to use RANSAC to fit a plane which normal project to [0,0,1] is higher than 0.8, which can infer that the plane is almost horizontal. Moreover, if the number of the plane point is larger than specific threshold, then we can say it is a floor.
+Finally, I am going to find out the obstacles. I use K-means to do clustering, and then use a convex hull to cover the obstacles and present the obstacle by its' vetex. As a result, each obstacle can be present as a list of 3D points.
+
+\subsection{Path Planning and Following}
+
+I choose a method refer from the paper~\cite{1527001}. It is a method which can choose a minimum angle and a safe distance as a new waypoint. After having the waypoints, I use pure pursuit to follow the path, and achieve my goal to let the robot self-driving and avoid obstacles.
+
+\addtolength{\textheight}{-12cm}   % This command serves to balance the column lengths
+                                  % on the last page of the document manually. It shortens
+                                  % the textheight of the last page by a suitable amount.
+                                  % This command does not take effect until the next page
+                                  % so it should come on the page before the last. Make
+                                  % sure that you do not shorten the textheight too much.
+
+\bibliographystyle{IEEEtran}
+\bibliography{egbib}
+
+\end{document}
