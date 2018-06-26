@@ -24,6 +24,7 @@
 \usepackage{graphicx}
 \usepackage[export]{adjustbox}
 \usepackage{hyperref}
+\newcommand\tab[1][1cm]{\hspace*{#1}}
 \graphicspath{ {images/} }
 
 
@@ -55,17 +56,17 @@ I use the wood and some Aluminum stick to build the robot. My robot has IMU, GPS
 
 
 \begin{figure}[h] % t means put this image at the top 
-\includegraphics[width=0.6\columnwidth]{robot}
+\includegraphics[width=0.8\columnwidth]{robot}
 \centering
 \caption{Self-driving robot}
 \label{figure:robot}
 \end{figure}
 
 \begin{figure}[t] % h means put this image here
-\includegraphics[width=0.8\columnwidth]{JGB37-520}
+\includegraphics[width=0.9\columnwidth]{gazebo}
 \centering
-\caption{JGB37-520 encoder motor}
- \label{figure:JGB37-520}
+\caption{Gazebo WAM-V obstacle avoidance}
+ \label{figure: WAM-V}
 \end{figure}
 
 \section{SPECIFIC AIMS}
@@ -90,17 +91,33 @@ I use the wood and some Aluminum stick to build the robot. My robot has IMU, GPS
 
 \subsection{Localization}
 
-I use IMU, GPS and wheel odometry to do EKF(Extended Kalman Filter). Also, I add LIDAR measurement to do SLAM (GMapping). And these two way can both get a robot odoemetry measurement. So I take these two odometry to do fusion again, and then I can get a very good robot localization and mapping.
+I use IMU, GPS and wheel odometry to do EKF(Extended Kalman Filter). Also, I add LIDAR measurement to do SLAM (GMapping). And these two way can both get a robot odometry measurement. So I take these two odometry data do fusion again, and then I can get a very good robot localization and mapping.
 
 \subsection{Point cloud Processing}
 
-First, I make the noise filter, which is to choose a point P and check how many points next to it within radius r. If the number is lower than a threshold, then we can tell it is an outlier noise.
-And then I do the plane filter to remove the floor, because the floor will affect our clustering result. The way I do is to use RANSAC to fit a plane which normal project to [0,0,1] is higher than 0.8, which can infer that the plane is almost horizontal. Moreover, if the number of the plane point is larger than specific threshold, then we can say it is a floor.
-Finally, I am going to find out the obstacles. I use K-means to do clustering, and then use a convex hull to cover the obstacles and present the obstacle by its' vetex. As a result, each obstacle can be present as a list of 3D points.
+First, I make the noise filter, which can remove the outlier noise. And then I use plane filter to remove the floor, because the floor will affect our clustering result. Finally, I use K-means to do clustering, and then use a convex hull to present the obstacle by its' vertex. As a result, each obstacle can be present as a list of points.
 
 \subsection{Path Planning and Following}
 
-I choose a method refer from the paper~\cite{1527001}. It is a method which can choose a minimum angle and a safe distance as a new waypoint. After having the waypoints, I use pure pursuit to follow the path, and achieve my goal to let the robot self-driving and avoid obstacles.
+I choose a method refer from the paper~\cite{1527001} to do path planning, and use pure pursuit to follow the path. Then it can let the robot achieve goal point and also avoid obstacles.
+
+\subsection{Demo videos} 
+\begin{itemize}
+\item Pure pursuit algorithm visualization: 
+\end{itemize}
+\tab\url{https://youtu.be/DdaZkm7_bjI}
+\begin{itemize}
+\item Self-driving at EE-building indoor: 
+\end{itemize}
+\tab\url{https://youtu.be/ve4Mln4D1xo}
+\begin{itemize}
+\item Self-driving at EE-building outdoor: 
+\end{itemize}
+\tab\url{https://youtu.be/E1anLPuXjxs}
+\begin{itemize}
+\item Self-driving WAM-V for RobotX task6: 
+\end{itemize}
+\tab\url{https://goo.gl/sDwa9j}
 
 \addtolength{\textheight}{-12cm}   % This command serves to balance the column lengths
                                   % on the last page of the document manually. It shortens
